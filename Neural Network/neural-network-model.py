@@ -29,14 +29,7 @@ class NN(object):
             self.bias = [np.random.randn(row,1) for row in self.size[1:]]
             print("initial parameters set")
             
-        '''
-        test case
-        
-        self.size=[2,2,2]
-        self.weight = np.array([ np.reshape([0.15, 0.2, 0.25, 0.3],(2,2)), np.reshape([0.4, 0.45, 0.5, 0.55], (2,2)) ])
-        self.bias = np.array([ np.reshape([0.35, 0.35],(2,1)), np.reshape([0.6, 0.6],(2,1)) ])
-        '''
-        
+               
     def sigmoid(self, numpy_array):
         if len(numpy_array)<= 0:
             return("check input array length")
@@ -147,25 +140,6 @@ class json_file(object):
         #cost = getattr(sys.modules[__name__], data["cost"])
         net = NN(data["size"], load_weight, load_bias)
         return(net)
-        
-
-'''
-#test case                
-a = NN([2,2,2])
-a.weight        
-array([[[ 0.15,  0.2 ],
-        [ 0.25,  0.3 ]],
-
-       [[ 0.4 ,  0.45],
-        [ 0.5 ,  0.55]]])
-a.SGD([[[0.1,0.5],[0.99,0.01]]],1,1,0.5)        
-a.weight        
-[array([[ 0.14941907,  0.19709535],
-        [ 0.24937527,  0.29687633]]), array([[ 0.41329812,  0.46360376],
-        [ 0.45924594,  0.50830926]])]     
-        
-'''
-
 
 
 
