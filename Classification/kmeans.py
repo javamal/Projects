@@ -92,9 +92,9 @@ class kmeans(object):
         plt.show()
         
             
-a = kmeans(df_2,3,5,0.01,1)
+a = kmeans(df_2,3,5,0.01,0.1)
 a.two_dim_plot(a.init)
 
-b = kmeans(df_3,3,5,0.01,3)
+b = kmeans(df_3,3,5,0.01,0.1)
 b.three_dim_plot(b.init)
 
