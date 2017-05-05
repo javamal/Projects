@@ -22,8 +22,7 @@ class Node(object):
                     new[i]=-1
                     computer=self.win(new,self.player)
                     self.subtree.append(Node(self.depth-1,new,-self.player,computer) )
-    
-    #Computer's sophistication depends on score distribution.        
+           
     def win(self,board,player):
         if player==1:
             my_move=1;counter_move=-1
@@ -44,16 +43,6 @@ class Node(object):
                         return(-player*10)
             '''
         return(0) #when nobody wins
-
-
-'''
-#instance test
-board=np.array([1,0,0,1,0,0,0,0,0])
-a=Node(9,board,1,0)
-a.subtree[0].subtree[0].subtree[0].subtree[0].subtree[0].subtree[0].subtree[0].board
-a.subtree[0].subtree[0].subtree[0].subtree[0].subtree[0].subtree[0].subtree[0].score
-a.subtree[0].subtree[0].subtree[1].subtree[1].subtree[0].subtree[2].score
-'''
 
 def reverse(node,player,depth,alpha=-math.inf,beta=math.inf):
     if len(node.subtree)==0 or depth==0:
@@ -162,9 +151,9 @@ def play():
         domain=np.where(computer_option==min(computer_option))[0]
         if len(domain)>1:
             print("multiple moves with same value")
-            board=computer_board[np.where(computer_option==min(computer_option))[0][random.randint(0,len(domain))]]
+            board=computer_board[domain[random.randint(0,len(domain)-1)]]
         else:
-            board=computer_board[np.where(computer_option==min(computer_option))[0][0]]
+            board=computer_board[domain[0]]
         print(np.reshape(board,(3,3)))
         if check(player,board)==True:
             again=input("play again? (y/n)" )
