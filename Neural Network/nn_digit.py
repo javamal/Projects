@@ -74,16 +74,6 @@ predicts 97% of test cases correctly.
 '''
 
 
-'''
-questions
-1) how does SGA work? it seems too simple,,, -> resolved (gradient descent)
-2) how does update batch work? why do we add partial derivative? -> resolved (gradient is sum of partial derivatives)
-3) how do we decide how much hidden layers we want to have? Further, how do we decide how much neuron -> don't know
-should we assign to each hidden layers?
-'''  
-
-
-
 
 
 
