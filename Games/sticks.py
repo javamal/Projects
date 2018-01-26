@@ -1,4 +1,4 @@
-import sys, math,random
+import sys, math,random, numpy as np
 class Node(object):
     def __init__(self,depth,n,p,value=0):
         self.depth=depth
@@ -25,10 +25,6 @@ class Node(object):
             return(0)
 
 def reverse_deduction(node,player,alpha=-math.inf,beta=math.inf): #game theory - dynamic game
-    '''
-    did not assign depth as variable.
-    will search until no subtrees exist
-    '''
     if len(node.subtree)==0:
         return(node.value)
     
@@ -48,23 +44,14 @@ def reverse_deduction(node,player,alpha=-math.inf,beta=math.inf): #game theory -
             if alpha>beta:
                 break
         return(init)
-'''
-strategy
-
-reverse_deduction(Node(4,4,1,0),1) #start with n=4, first to play loses
-reverse_deduction(Node(3,3,1,0),1) #start with n=3, first to play wins
-reverse_deduction(Node(5,5,1,0),1) #start with n=5, first to play gets to n=3 and wins   
-reverse_deduction(Node(1,1,1,0),1)  
-reverse_deduction(Node(0,1,1,0),1) #terminal node
-'''
 
 def check(n,p):
     if n==0:
         if p==1: #call function before changing player
-            print("computer")
+            print("computer wins")
             return(True)
         else:
-            print("human")
+            print("human wins")
             return(True)
     else:
         return(False)
@@ -73,12 +60,15 @@ def play(n):
     initial=n
     p=1
     while True:
-        move=input("1 or 2: ")
-        if move!="1" and move!="2":
-            return("wrong input value")
-        n=n-int(float(move))
-        if n<0:
-            return("only "+str(n)+" remaining")
+        while True:
+            move=input("1 or 2: ")
+            if move!="1" and move!="2":
+                print("wrong input value")
+            elif n-int(float(move)) < 0:
+                print("only "+str(n)+" stick(s) remaining")
+            else:
+                break
+        n=n-int(float(move))     
         print("human plays "+str(move)+". Remaining: "+str(n))
         if check(n,p)==False: #Computer plays
             p=-p #switch
@@ -89,18 +79,14 @@ def play(n):
                     options=options+[reverse_deduction(i,-p)] #subtree starts with oppontent
             print("Current state: Terminal node score for computer\n"+str(options))
                         
-            if min(options)==options[0]:
-                if min(options)==options[1]:
-                    print("computer loses either way. Computer plays randomly generated move")
-                    computer_move=[1,2][random.randint(0,1)]
+            if len(options)==2:
+                if options[0] == options[1]:
+                    print("computer plays randomly generated move")
+                    computer_move = [1,2][random.randint(0,1)]
                 else:
-                    computer_move=1
-            elif min(options)==options[1]:
-                if min(options)==options[0]:
-                    print("computer loses either way. Computer plays randomly generated move")
-                    computer_move=[1,2][random.randint(0,1)]
-                else:
-                    computer_move=2
+                    computer_move = [1,2][np.where(np.array(options)==min(options))[0][0]]
+            elif len(options)==1:
+                computer_move = [1,2][0]
                                                               
             n=n-computer_move
             if n<0:
