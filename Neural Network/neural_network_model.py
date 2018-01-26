@@ -4,11 +4,11 @@ import os, json, math
 
 '''
 Sources:
-    1) overall structure from,
+    1) Instructions from:
     http://neuralnetworksanddeeplearning.com/chap1.html
-    2) feed forward and back propagation algorithm from,
+    2) feed forward and back propagation instructions from:
     https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
-    3) SGD from,
+    3) SGD instructions from:
     https://iamtrask.github.io/2015/07/27/python-network-part2/
 '''   
 
