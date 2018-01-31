@@ -1,4 +1,6 @@
-import math, random, numpy as np
+import math
+import random
+import numpy as np
 
 class Tree(object):
     def __init__(self,depth,p,board,score=0):
