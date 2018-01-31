@@ -1,9 +1,12 @@
-import os, json, numpy as np, matplotlib.pyplot as plt
-os.chdir = 'C:\\Users\\donkey\\Desktop\\machine learning\\Neural Network'
+import os
+import json
+import numpy as np
+import matplotlib.pyplot as plt
+import digit_data
 from nn import NN, json_file #import class from python file
 from image import Read
-import digit_data
 
+os.chdir = 'C:\\Users\\donkey\\Desktop\\machine learning\\Neural Network'
 
 '''
 1. Import neural network model, with trained parameters
