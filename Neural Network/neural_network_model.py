@@ -1,6 +1,8 @@
-import numpy as np, matplotlib.pyplot as plt
-import os, json, math
-
+import os
+import json
+import math
+import numpy as np
+import matplotlib.pyplot as plt
 
 '''
 Sources:
