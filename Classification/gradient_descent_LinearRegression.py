@@ -25,5 +25,6 @@ def sgd(learning_rate, tresh, m = 0, b = 0):
         else:
             m = m_new
             b = b_new
-            
+
+#how do we choose parameters?
 sgd(0.000005, 0.0001)
