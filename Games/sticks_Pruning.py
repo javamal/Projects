@@ -1,4 +1,7 @@
-import sys, math,random, numpy as np
+import math
+import random
+import numpy as np
+
 class Node(object):
     def __init__(self,depth,n,p,value=0):
         self.depth=depth
