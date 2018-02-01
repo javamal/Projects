@@ -1,4 +1,4 @@
-from neural_network import Neural_Network #importing class
+from neural_network import Neural_Network
 import requests, re, pandas as pd, numpy as np
 import sklearn.linear_model
 
