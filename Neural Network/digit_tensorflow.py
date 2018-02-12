@@ -41,14 +41,20 @@ def test_train(x, rate):
         sess.run(tf.global_variables_initializer())
         for epoch in range(total_epochs):
             loss = 0
-            for batch in range(int(mnist.train.num_examples / batch_size)):
-                batch_x, batch_y = mnist.train.next_batch(batch_size)
+            shuffle_index = np.random.permutation(mnist.train.num_examples)
+            x_train = mnist.train.images[shuffle_index]
+            y_train = mnist.train.labels[shuffle_index]
+            train_index = 0
+            for batch in range(int(mnist.train.num_examples / batch_size)):                
+                batch_x = x_train[train_index : train_index + batch_size]
+                batch_y = y_train[train_index : train_index + batch_size]
                 op, c = sess.run([optimizer, cost], feed_dict = {x:batch_x, y:batch_y})
                 loss = loss + c
+                train_index = train_index + batch_size
             print("epoch: ", epoch, "total loss: ", loss)
             
         list_test = tf.equal(tf.argmax(y_hat, 1), tf.argmax(y, 1)) #by row
         prediction_rate = tf.reduce_mean(tf.cast(list_test, 'float'))
         print("prediction rate: ", sess.run(prediction_rate, feed_dict = {x: mnist.test.images, y:mnist.test.labels}))
 
-test_train(x, 0.5)
+test_train(x, 0.7)
