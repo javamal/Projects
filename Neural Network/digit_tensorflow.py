@@ -6,66 +6,51 @@ mnist = input_data.read_data_sets("/tmp/data/", one_hot = True)
 
 #parameters
 input_size = 784
-neuron_1 = 500
-neuron_2 = 500
-neuron_3 = 500
+neuron_1 = 30
 output_size = 10
+total_epochs = 10
 batch_size = 100
 
-x = tf.placeholder('float', [None, 784])
+#define placeholders
+x = tf.placeholder('float', [input_size, 1])
 y = tf.placeholder('float')
 
-def model(data):
+def feed_forward(data):    
+    layer_1 = {"weights":tf.Variable(tf.random_normal([neuron_1, input_size])), \
+               "bias":tf.Variable(tf.random_normal([neuron_1, 1]))}
+    output_layer = {"weights":tf.Variable(tf.random_normal([output_size, neuron_1])), \
+                    "bias":tf.Variable(tf.random_normal([output_size, 1]))}
+    #Note t(x dot y) = t(y) dot t(x)
+    out_1 = tf.matmul(layer_1["weights"], data) + layer_1["bias"]
+    out_1 = tf.nn.relu(out_1)    
+    output_1 = tf.matmul(output_layer["weights"], out_1) + output_layer["bias"]
+    return(output_1)
     
-    hidden_layer_1 = {"weights": tf.Variable(tf.random_normal([input_size, neuron_1])), \
-                      "biases": tf.Variable(tf.random_normal([neuron_1]))}
-                                                             
-    hidden_layer_2 = {"weights": tf.Variable(tf.random_normal([neuron_1, neuron_2])), \
-                      "biases": tf.Variable(tf.random_normal([neuron_2]))}
-                                                             
-    hidden_layer_3 = {"weights": tf.Variable(tf.random_normal([neuron_2, neuron_3])), \
-                      "biases": tf.Variable(tf.random_normal([neuron_3]))}
-    
-    output_layer = {"weights": tf.Variable(tf.random_normal([neuron_3, output_size])), \
-                    "biases": tf.Variable(tf.random_normal([output_size]))}
-
-    out_1  = tf.add(tf.matmul(data, hidden_layer_1["weights"]), hidden_layer_1["biases"])
-    activation_1 = tf.nn.relu(out_1)     
-
-    out_2  = tf.add(tf.matmul(activation_1, hidden_layer_2["weights"]), hidden_layer_2["biases"])
-    activation_2 = tf.nn.relu(out_2)
-
-    out_3  = tf.add(tf.matmul(activation_2, hidden_layer_3["weights"]), hidden_layer_3["biases"])
-    activation_3 = tf.nn.relu(out_3)   
-
-    output_out  = tf.add(tf.matmul(activation_3, output_layer["weights"]), output_layer["biases"])
-        
-    return(output_out)       
-
-    
-def train_test_model(input_data):
-    y_hat = model(input_data)
-    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = y_hat, labels = y))
-    #cost = tf.reduce_sum(tf.square(y - y_hat))
-    optimizer = tf.train.AdamOptimizer().minimize(cost)
-    total_epochs = 10
-    
+def train_test_model(data, rate):
+    y_hat = feed_forward(data)
+    cost = tf.reduce_sum(tf.square(y_hat - y))
+    back_prop = tf.train.GradientDescentOptimizer(rate).minimize(cost)
     with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())        
+        sess.run(tf.global_variables_initializer())
         for epoch in range(total_epochs):
-            epoch_loss = 0; train_index = 0
-            for epoch_iter in range(int(mnist.train.num_examples / batch_size)+1):
-                epoch_x = mnist.train.images[train_index: train_index + batch_size]
-                epoch_y = mnist.train.labels[train_index: train_index + batch_size]
-                sess.run(optimizer, feed_dict = {x:epoch_x, y:epoch_y})
-                c = sess.run(cost, feed_dict = {x:epoch_x, y:epoch_y})
-                epoch_loss = epoch_loss + c
-                train_index = train_index + batch_size
-                print("trained up to:", train_index)
-            print('Epoch', epoch, 'completed out of', total_epochs, 'loss:', epoch_loss)
+            loss = 0
+            shuffle_index = np.random.permutation(mnist.train.num_examples)
+            x_images = mnist.train.images[shuffle_index]
+            y_labels = mnist.train.labels[shuffle_index]
+            for x_row, y_row in zip(x_images, y_labels):
+                x_train = np.reshape(x_row, (input_size, 1))
+                y_train = np.reshape(y_row, (output_size, 1))
+                sess.run(back_prop, feed_dict = {x:x_train, y:y_train})
+                loss = loss + sess.run(cost, feed_dict = {x:x_train, y:y_train})
+            print("epochs: ", epoch, " Total loss: ", loss)
+        
+        test = []
+        for x_row_test, y_row_test in zip(mnist.test.images[0:50], mnist.test.labels[0:50]):
+            x_test = np.reshape(x_row_test, (input_size, 1))
+            y_test = np.reshape(y_row_test, (output_size, 1))
+            test.append(sess.run(tf.equal(tf.argmax(y_hat), tf.argmax(y_test)), feed_dict = {x:x_test, y:y_test}))
+            print(sess.run(tf.argmax(y_hat), feed_dict = {x:x_test, y:y_test}))
+        prediction_rate =  sum(test) / len(test)
+        print(prediction_rate)                
             
-        correct = tf.equal(tf.argmax(y_hat, 1), tf.argmax(y,1))
-        accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
-        print('Accuracy:', accuracy.eval({x:mnist.test.images, y:mnist.test.labels}))
-            
-train_test_model(x)
+train_test_model(x, 0.00000005)    
