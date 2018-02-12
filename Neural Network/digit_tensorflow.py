@@ -1,3 +1,6 @@
+#same as neural_network_from_scratch.py 
+#using tensorflow
+
 import tensorflow as tf
 import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
@@ -8,49 +11,44 @@ mnist = input_data.read_data_sets("/tmp/data/", one_hot = True)
 input_size = 784
 neuron_1 = 30
 output_size = 10
-total_epochs = 10
-batch_size = 100
+total_epochs = 50
+batch_size = 10
 
 #define placeholders
-x = tf.placeholder('float', [input_size, 1])
-y = tf.placeholder('float')
+x = tf.placeholder('float', [None, input_size])
+y = tf.placeholder('float', [None, output_size])
 
-def feed_forward(data):    
-    layer_1 = {"weights":tf.Variable(tf.random_normal([neuron_1, input_size])), \
-               "bias":tf.Variable(tf.random_normal([neuron_1, 1]))}
-    output_layer = {"weights":tf.Variable(tf.random_normal([output_size, neuron_1])), \
-                    "bias":tf.Variable(tf.random_normal([output_size, 1]))}
-    #Note t(x dot y) = t(y) dot t(x)
-    out_1 = tf.matmul(layer_1["weights"], data) + layer_1["bias"]
-    out_1 = tf.nn.relu(out_1)    
-    output_1 = tf.matmul(output_layer["weights"], out_1) + output_layer["bias"]
-    return(output_1)
+#set model and feed forward
+def feed_forward(data):
+    layer_1 = {"weights":tf.Variable(tf.random_normal([input_size, neuron_1])),
+               "bias":tf.Variable(tf.random_normal([1, neuron_1]))}
+    output_layer = {"weights":tf.Variable(tf.random_normal([neuron_1, output_size])),
+                    "bias":tf.Variable(tf.random_normal([1, output_size]))}
     
-def train_test_model(data, rate):
-    y_hat = feed_forward(data)
-    cost = tf.reduce_sum(tf.square(y_hat - y))
-    back_prop = tf.train.GradientDescentOptimizer(rate).minimize(cost)
+    #t(W * x) = t(x) * t(W)
+    layer_1_out = tf.matmul(data, layer_1["weights"])
+    layer_1_out_relu = tf.nn.sigmoid(layer_1_out)
+    
+    output_out = tf.matmul(layer_1_out_relu, output_layer["weights"])
+    
+    return(output_out)
+
+def test_train(x, rate):
+    y_hat = feed_forward(x)
+    cost = tf.reduce_mean(tf.square(y_hat - y))
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate = rate).minimize(cost)
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         for epoch in range(total_epochs):
             loss = 0
-            shuffle_index = np.random.permutation(mnist.train.num_examples)
-            x_images = mnist.train.images[shuffle_index]
-            y_labels = mnist.train.labels[shuffle_index]
-            for x_row, y_row in zip(x_images, y_labels):
-                x_train = np.reshape(x_row, (input_size, 1))
-                y_train = np.reshape(y_row, (output_size, 1))
-                sess.run(back_prop, feed_dict = {x:x_train, y:y_train})
-                loss = loss + sess.run(cost, feed_dict = {x:x_train, y:y_train})
-            print("epochs: ", epoch, " Total loss: ", loss)
-        
-        test = []
-        for x_row_test, y_row_test in zip(mnist.test.images[0:50], mnist.test.labels[0:50]):
-            x_test = np.reshape(x_row_test, (input_size, 1))
-            y_test = np.reshape(y_row_test, (output_size, 1))
-            test.append(sess.run(tf.equal(tf.argmax(y_hat), tf.argmax(y_test)), feed_dict = {x:x_test, y:y_test}))
-            print(sess.run(tf.argmax(y_hat), feed_dict = {x:x_test, y:y_test}))
-        prediction_rate =  sum(test) / len(test)
-        print(prediction_rate)                
+            for batch in range(int(mnist.train.num_examples / batch_size)):
+                batch_x, batch_y = mnist.train.next_batch(batch_size)
+                op, c = sess.run([optimizer, cost], feed_dict = {x:batch_x, y:batch_y})
+                loss = loss + c
+            print("epoch: ", epoch, "total loss: ", loss)
             
-train_test_model(x, 0.00000005)    
+        list_test = tf.equal(tf.argmax(y_hat, 1), tf.argmax(y, 1)) #by row
+        prediction_rate = tf.reduce_mean(tf.cast(list_test, 'float'))
+        print("prediction rate: ", sess.run(prediction_rate, feed_dict = {x: mnist.test.images, y:mnist.test.labels}))
+
+test_train(x, 0.5)
