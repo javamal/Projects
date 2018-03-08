@@ -1,4 +1,4 @@
-#same as neural_network_from_scratch.py 
+#same as neural_network_from_scratch.py except for adaptive moment optimizer
 #using tensorflow
 import tensorflow as tf
 import numpy as np
@@ -32,10 +32,10 @@ def feed_forward(data):
     
     return(output_out)
 
-def test_train(x, rate):
+def test_train(x):
     y_hat = feed_forward(x)
-    cost = tf.reduce_mean(tf.square(y_hat - y))
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate = rate).minimize(cost)
+    cost = tf.reduce_sum(0.5*tf.square(y_hat - y))
+    optimizer = tf.train.AdamOptimizer().minimize(cost)
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         for epoch in range(total_epochs):
@@ -56,4 +56,5 @@ def test_train(x, rate):
         prediction_rate = tf.reduce_mean(tf.cast(list_test, 'float'))
         print("prediction rate: ", sess.run(prediction_rate, feed_dict = {x: mnist.test.images, y:mnist.test.labels}))
 
-test_train(x, 0.8) #prediction rate of 91%. Could improve
+test_train(x) #prediction rate is only 91%. Could improve
+
