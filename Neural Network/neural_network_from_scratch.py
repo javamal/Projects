@@ -138,8 +138,7 @@ class json_file(object):
         data = json.load(f)
         f.close()
         load_weight = [np.array(w) for w in data["weight"]]
-        load_bias = [np.array(b) for b in data["bias"]]
-        #cost = getattr(sys.modules[__name__], data["cost"])
+        load_bias = [np.array(b) for b in data["bias"]]        
         net = NN(data["size"], load_weight, load_bias)
         return(net)
 
