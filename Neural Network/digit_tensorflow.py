@@ -26,9 +26,9 @@ def feed_forward(data):
     
     #t(W * x) = t(x) * t(W)
     layer_1_out = tf.matmul(data, layer_1["weights"])
-    layer_1_out_relu = tf.nn.sigmoid(layer_1_out)
+    layer_1_out_sigmoid = tf.nn.sigmoid(layer_1_out)
     
-    output_out = tf.matmul(layer_1_out_relu, output_layer["weights"])
+    output_out = tf.matmul(layer_1_out_sigmoid, output_layer["weights"])
     
     return(output_out)
 
