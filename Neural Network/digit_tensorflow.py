@@ -1,6 +1,6 @@
-#activation functions relu and softmax
-#loss function cross entropy loss function
-#optimizer adaptive moment estimation
+#activation function: relu and softmax
+#loss function: cross entropy
+#optimizer: adaptive moment estimation
 import tensorflow as tf
 import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
