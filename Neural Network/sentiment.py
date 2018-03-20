@@ -37,8 +37,12 @@ def bag_of_words(lower, data = sentiment):
         bag_of_words_item = np.zeros(len(total_frame))
         word_token = nltk.tokenize.word_tokenize(sentences.lower())        
         for word in word_token:
-            if word in total_frame:            
-                bag_of_words_item[total_frame.index(word)] = bag_of_words_item[total_frame.index(word)] + 1
+            try:
+                lemmatized_word = nltk.stem.WordNetLemmatizer().lemmatize(word)
+                if lemmatized_word in total_frame:            
+                    bag_of_words_item[total_frame.index(lemmatized_word)] = bag_of_words_item[total_frame.index(lemmatized_word)] + 1
+            except:
+                print("error in: ", sentences, " error in word: ", word)
         if(sum(bag_of_words_item)==0):
             print(sentences)
         bag.append(bag_of_words_item)
@@ -69,9 +73,10 @@ def save_sentiment_bow(lower, test_portion, data = sentiment, file = "bagofwords
     
 a = bag_of_words(50)
 
-i = 20200
+i = 2222
 a["text"][i]    
 np.array(a["frame"])[np.where(a["bag_of_words"][i]==1)[0]]
-a["label"]     
-    
-    
+a["label"][i]  
+
+
+nltk.tokenize.word_tokenize("i have been running all day")  
