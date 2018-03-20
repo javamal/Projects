@@ -65,9 +65,16 @@ def twitter_sentiment_2(twitter_2_path):
 combined data in dictionary format
 data will be a dictionary of keys x and y. x: raw text and y: one-hot label     
 '''
+
 sentiment = {"x":review_sentiment(reviews)["x"] + twitter_sentiment(twitter)["x"] + twitter_sentiment_2(twitter_2)["x"], \
              "y":review_sentiment(reviews)["y"] + twitter_sentiment(twitter)["y"] + twitter_sentiment_2(twitter_2)["y"]} 
 
+'''
+with ("sentiment_data.pickle", "wb") as save_file:
+    pickle.dump(sentiment, save_file)
+    save_file.close()
+'''
+    
 def word_frame(data = sentiment, file_name = "wordframe.pickle"):
     '''
     word_frame() takes in a dictionary of raw text and returns a template for the input layer
@@ -85,65 +92,11 @@ def word_frame(data = sentiment, file_name = "wordframe.pickle"):
         pickle.dump(word_dictionary, save_file)
         save_file.close()
         print("word frame dictionary saved as pickle file") 
-    return(word_dictionary)        
- 
-'''
-data clean -> create frame -> create bag of words
-'''   
-def filtered(lower, file = "wordframe.pickle"):    
-    '''
-    filtered selects words that were most common from total_frame
-    '''
-    with open(file, "br") as read_file:
-        frame = pickle.load(read_file)
-        read_file.close()
-    filtered_frame = []
-    for i in range(len(frame)):
-        if list(frame.values())[i] > lower:
-            filtered_frame.append(list(frame.keys())[i])
-    return(filtered_frame)
-    
-def bag_of_words(lower, data = sentiment):
-    '''
-    bag_of_words() takes in sentiment data and filtered total frame
-    input data in vector count format and label in one-hot vector format
-    '''
-    total_frame = filtered(lower)
-    x_raw = data["x"]; y_raw = data["y"]
-    bag = []
-    for sentences in x_raw:        
-        bag_of_words_item = np.zeros(len(total_frame))
-        word_token = nltk.tokenize.word_tokenize(sentences.lower()) 
-        '''
-        use sparse matrix?
-        '''
-        for word in word_token:
-            if word in total_frame:            
-                bag_of_words_item[total_frame.index(word)] = bag_of_words_item[total_frame.index(word)] + 1
-        if(sum(bag_of_words_item)==0):
-            print(sentences)
-        bag.append(bag_of_words_item)
-    return({"bag_of_words":bag, "label":y_raw})
-    
-def train_test(lower, test_portion):    
-    data = bag_of_words(lower)
-    #random_index = np.random.permutation(len(data["bag_of_words"]))
-    random_index = np.arange(0, len(data["bag_of_words"]))
-    data["bag_of_words"] = np.array(data["bag_of_words"])[random_index]
-    data["label"] = np.array(data["label"])[random_index]    
-    index = int(len(data["bag_of_words"]) * test_portion)
-    train_x = data["bag_of_words"][-index:]
-    test_x = data["bag_of_words"][:index]
-    train_y = data["label"][-index:]
-    test_y = data["label"][:index]
-    return({"train_x":train_x, "train_y":train_y, "test_x":test_x, "test_y":test_y})  
+    return(word_dictionary) 
 
-def save_sentiment_bow(lower, test_portion, data = sentiment, file = "bagofwords.pickle"):
-    save_data = train_test(lower, test_portion)
-    with open(file, "wb") as save_file:
-        pickle.dump(save_data, save_file)
-        save_file.close()
-        print("saved as: file")
-    return(True)
+
     
-save_sentiment_bow(lower = 75, test_portion = 0.1)
+    
+
+
+       
