@@ -10,12 +10,12 @@ np.set_printoptions(threshold=np.nan)
 #load sentiment_data.pickle for raw text data and label
 #load wordframe.pickle for input vector template
 
-with open("sentiment_data.pickle", "rb") as save_file:
+with open("Sentiment_Data_Raw.pickle", "rb") as save_file:
     print("loading raw text and label")
     sentiment = pickle.load(save_file)
     save_file.close()
     
-def filtered(lower, file = "wordframe.pickle"):    
+def filtered(lower, file = "Sentiment_Data_Wordframe.pickle"):    
     '''
     filtered selects words that were most common from total_frame
     '''
@@ -66,7 +66,7 @@ def train_test(lower, test_portion):
     print("saving test data: ", len(test_x), " data points")
     return({"train_x":train_x, "train_y":train_y, "test_x":test_x, "test_y":test_y})  
 
-def save_sentiment_bow(lower, test_portion, data = sentiment, file = "bagofwords.pickle"):
+def save_sentiment_bow(lower, test_portion, data = sentiment, file = "Sentiment_Data_BoW.pickle"):
     save_data = train_test(lower, test_portion)
     with open(file, "wb") as save_file:
         pickle.dump(save_data, save_file)
@@ -75,4 +75,3 @@ def save_sentiment_bow(lower, test_portion, data = sentiment, file = "bagofwords
     return(True)
    
 save_sentiment_bow(lower = 1, test_portion = 0.1)    
-
