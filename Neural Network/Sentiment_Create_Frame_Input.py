@@ -8,8 +8,6 @@ import pandas as pd
 np.set_printoptions(threshold=np.nan)
 
 '''
-three sets of sentiment data organized in different format
-'''
 reviews = "C:\\Users\\donkey\\Desktop\\machine learning\\Data\\Sentiment\\reviews.txt"
 def review_sentiment(review_path):
     with open(review_path, "r") as file:
@@ -48,20 +46,24 @@ def twitter_sentiment(twitter_path):
         return({"x":x, "y":y})
      
 
-'''
-combined data in dictionary format
-data will be a dictionary of keys x and y. x: raw text and y: one-hot label     
-'''
+
+#combined data in dictionary format
+#data will be a dictionary of keys x and y. x: raw text and y: one-hot label     
 sentiment = {"x":review_sentiment(reviews)["x"] + twitter_sentiment(twitter)["x"], \
              "y":review_sentiment(reviews)["y"] + twitter_sentiment(twitter)["y"]} 
 
 
-with open("sentiment_data.pickle", "wb") as save_file:
+with open("Sentiment_Data_Raw.pickle", "wb") as save_file:
     pickle.dump(sentiment, save_file)
     save_file.close()
+'''
+
+with open("Sentiment_Data_Raw.pickle", "rb") as read_file:
+    sentiment = pickle.load(read_file)
+    read_file.close()
 
     
-def word_frame(data = sentiment, file_name = "wordframe.pickle"):
+def word_frame(data = sentiment, file_name = "Sentiment_Data_Wordframe.pickle"):
     '''
     word_frame() takes in a dictionary of raw text and returns a template for the input layer
     each input data will be transformed to a count vector based on this template
@@ -85,7 +87,4 @@ def word_frame(data = sentiment, file_name = "wordframe.pickle"):
     return(word_dictionary) 
 
 #word_frame()
-    
-
-
        
