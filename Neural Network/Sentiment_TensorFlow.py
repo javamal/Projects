@@ -2,16 +2,27 @@ import pickle
 import numpy as np
 import tensorflow as tf
 
-with open("bagofwords.pickle", "br") as load_file:
+'''
+load test and train data
+'''
+with open("bagofwords.pickle", "rb") as load_file:
     file = pickle.load(load_file) #label is mixed, no need to shuffle
     load_file.close()
-  
+
+    '''
+load word frame 
+'''    
+with open("wordframe.pickle", "rb") as read_file:
+    frame = pickle.load(read_file)
+    read_file.close()      
+    
 #parameters
-input_size = len(file["train_x"][0])   
-neuron_1 = 50
-neuron_2 = 50
+input_size = len(file["train_x"][0])
+neuron_1 = 500
+neuron_2 = 500
+neuron_3 = 500
 output_size = len(file["train_y"][0])
-total_epochs = 100
+total_epochs = 10
 batch_size = 100
 
 #define placeholders
@@ -22,9 +33,14 @@ y = tf.placeholder('float', [None, output_size])
 def feed_forward(data):
     layer_1 = {"weights":tf.Variable(tf.random_normal([input_size, neuron_1])),
                "bias":tf.Variable(tf.random_normal([1, neuron_1]))}
+
     layer_2 = {"weights":tf.Variable(tf.random_normal([neuron_1, neuron_2])),
-               "bias":tf.Variable(tf.random_normal([1, neuron_1]))}
-    output_layer = {"weights":tf.Variable(tf.random_normal([neuron_2, output_size])),
+               "bias":tf.Variable(tf.random_normal([1, neuron_2]))}
+
+    layer_3 = {"weights":tf.Variable(tf.random_normal([neuron_2, neuron_3])),
+               "bias":tf.Variable(tf.random_normal([1, neuron_3]))}
+
+    output_layer = {"weights":tf.Variable(tf.random_normal([neuron_3, output_size])),
                     "bias":tf.Variable(tf.random_normal([1, output_size]))}
     
     #t(W * x) = t(x) * t(W)
@@ -34,12 +50,15 @@ def feed_forward(data):
     layer_2_out = tf.matmul(layer_1_out, layer_2["weights"]) + layer_2["bias"]
     layer_2_out = tf.nn.relu(layer_2_out)
     
-    output_out = tf.matmul(layer_2_out, output_layer["weights"])    
+    layer_3_out = tf.matmul(layer_2_out, layer_3["weights"]) + layer_3["bias"]
+    layer_3_out = tf.nn.relu(layer_3_out)
+    
+    output_out = tf.matmul(layer_3_out, output_layer["weights"]) + output_layer["bias"]    
     return(output_out)
 
 def test_train(x):
     y_hat = feed_forward(x)
-    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = y, logits = y_hat))
+    cost = -tf.reduce_sum(y * tf.nn.log_softmax(y_hat))
     optimizer = tf.train.AdamOptimizer().minimize(cost)
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
@@ -63,3 +82,4 @@ def test_train(x):
 
 test_train(x)
     
+
