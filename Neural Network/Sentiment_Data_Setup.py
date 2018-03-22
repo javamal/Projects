@@ -7,11 +7,14 @@ import numpy as np
 import pandas as pd
 np.set_printoptions(threshold=np.nan)
 
+#load sentiment_data.pickle for raw text data and label
+#load wordframe.pickle for input vector template
+
 with open("sentiment_data.pickle", "rb") as save_file:
     print("loading raw text and label")
     sentiment = pickle.load(save_file)
     save_file.close()
-
+    
 def filtered(lower, file = "wordframe.pickle"):    
     '''
     filtered selects words that were most common from total_frame
@@ -38,26 +41,29 @@ def bag_of_words(lower, data = sentiment):
         word_token = nltk.tokenize.word_tokenize(sentences.lower())        
         for word in word_token:
             try:
-                lemmatized_word = nltk.stem.WordNetLemmatizer().lemmatize(word)
+                lemmatized_word = nltk.stem.WordNetLemmatizer().lemmatize(word, "v")
                 if lemmatized_word in total_frame:            
                     bag_of_words_item[total_frame.index(lemmatized_word)] = bag_of_words_item[total_frame.index(lemmatized_word)] + 1
             except:
                 print("error in: ", sentences, " error in word: ", word)
         if(sum(bag_of_words_item)==0):
             print(sentences)
-        bag.append(bag_of_words_item)
+        bag.append(bag_of_words_item)                
     return({"bag_of_words":bag, "label":y_raw, "text":x_raw, "frame":total_frame})
     
 def train_test(lower, test_portion):    
     data = bag_of_words(lower)
-    random_index = np.random.permutation(len(data["bag_of_words"]))    
+    random_index = np.random.permutation(len(data["bag_of_words"]))   
     data["bag_of_words"] = np.array(data["bag_of_words"])[random_index]
     data["label"] = np.array(data["label"])[random_index]    
-    index = int(len(data["bag_of_words"]) * test_portion)
-    train_x = data["bag_of_words"][-index:]
-    test_x = data["bag_of_words"][:index]
-    train_y = data["label"][-index:]
-    test_y = data["label"][:index]
+    index = int(len(data["bag_of_words"]) * (1-test_portion))
+    
+    train_x = data["bag_of_words"][:index]
+    test_x = data["bag_of_words"][index:]
+    train_y = data["label"][:index]
+    test_y = data["label"][index:]
+    print("saving training data: ", len(train_x), " data points")
+    print("saving test data: ", len(test_x), " data points")
     return({"train_x":train_x, "train_y":train_y, "test_x":test_x, "test_y":test_y})  
 
 def save_sentiment_bow(lower, test_portion, data = sentiment, file = "bagofwords.pickle"):
@@ -67,16 +73,6 @@ def save_sentiment_bow(lower, test_portion, data = sentiment, file = "bagofwords
         save_file.close()
         print("saved as: file")
     return(True)
-    
-#save_sentiment_bow(lower = 75, test_portion = 0.1)    
-    
-    
-a = bag_of_words(50)
+   
+save_sentiment_bow(lower = 1, test_portion = 0.1)    
 
-i = 2222
-a["text"][i]    
-np.array(a["frame"])[np.where(a["bag_of_words"][i]==1)[0]]
-a["label"][i]  
-
-
-nltk.tokenize.word_tokenize("i have been running all day")  
