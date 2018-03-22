@@ -5,14 +5,14 @@ import tensorflow as tf
 '''
 load test and train data
 '''
-with open("bagofwords.pickle", "rb") as load_file:
+with open("Sentiment_Data_BoW.pickle", "rb") as load_file:
     file = pickle.load(load_file) #label is mixed, no need to shuffle
     load_file.close()
 
     '''
 load word frame 
 '''    
-with open("wordframe.pickle", "rb") as read_file:
+with open("Sentiment_Data_Wordframe.pickle", "rb") as read_file:
     frame = pickle.load(read_file)
     read_file.close()      
     
@@ -82,4 +82,3 @@ def test_train(x):
 
 test_train(x)
     
-
