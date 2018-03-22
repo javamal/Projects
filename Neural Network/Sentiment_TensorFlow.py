@@ -1,3 +1,4 @@
+import nltk
 import pickle
 import numpy as np
 import tensorflow as tf
@@ -7,15 +8,8 @@ load test and train data
 '''
 with open("Sentiment_Data_BoW.pickle", "rb") as load_file:
     file = pickle.load(load_file) #label is mixed, no need to shuffle
-    load_file.close()
+    load_file.close()    
 
-    '''
-load word frame 
-'''    
-with open("Sentiment_Data_Wordframe.pickle", "rb") as read_file:
-    frame = pickle.load(read_file)
-    read_file.close()      
-    
 #parameters
 input_size = len(file["train_x"][0])
 neuron_1 = 500
@@ -82,3 +76,14 @@ def test_train(x):
 
 test_train(x)
     
+def convert_to_input(string, total_frame = file["frame"]):
+    bag_of_words_item = np.zeros(len(total_frame))
+    word_token = nltk.tokenize.word_tokenize(string.lower())        
+    for word in word_token:
+        lemmatized_word = nltk.stem.WordNetLemmatizer().lemmatize(word, "v")
+        if lemmatized_word in total_frame:            
+            bag_of_words_item[total_frame.index(lemmatized_word)] = bag_of_words_item[total_frame.index(lemmatized_word)] + 1
+    return(np.array(bag_of_words_item))
+
+
+a = convert_to_input("this product is the worst mistake I ahve ever made")
