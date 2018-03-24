@@ -23,20 +23,20 @@ batch_size = 100
 x = tf.placeholder('float', [None, input_size])
 y = tf.placeholder('float', [None, output_size])
 
-#set model and feed forward
-def feed_forward(data):
-    layer_1 = {"weights":tf.Variable(tf.random_normal([input_size, neuron_1])),
-               "bias":tf.Variable(tf.random_normal([1, neuron_1]))}
+#define variables
+layer_1 = {"weights":tf.Variable(tf.random_normal([input_size, neuron_1])),
+           "bias":tf.Variable(tf.random_normal([1, neuron_1]))}
+layer_2 = {"weights":tf.Variable(tf.random_normal([neuron_1, neuron_2])),
+           "bias":tf.Variable(tf.random_normal([1, neuron_2]))}
+layer_3 = {"weights":tf.Variable(tf.random_normal([neuron_2, neuron_3])),
+           "bias":tf.Variable(tf.random_normal([1, neuron_3]))}
+output_layer = {"weights":tf.Variable(tf.random_normal([neuron_3, output_size])),
+                "bias":tf.Variable(tf.random_normal([1, output_size]))}                                                        
 
-    layer_2 = {"weights":tf.Variable(tf.random_normal([neuron_1, neuron_2])),
-               "bias":tf.Variable(tf.random_normal([1, neuron_2]))}
-
-    layer_3 = {"weights":tf.Variable(tf.random_normal([neuron_2, neuron_3])),
-               "bias":tf.Variable(tf.random_normal([1, neuron_3]))}
-
-    output_layer = {"weights":tf.Variable(tf.random_normal([neuron_3, output_size])),
-                    "bias":tf.Variable(tf.random_normal([1, output_size]))}
-    
+saver = tf.train.Saver()                                           
+              
+def feed_forward(data):    
+    #using rectified linear units as activation functions
     #t(W * x) = t(x) * t(W)
     layer_1_out = tf.matmul(data, layer_1["weights"]) + layer_1["bias"]
     layer_1_out = tf.nn.relu(layer_1_out)
@@ -69,21 +69,75 @@ def test_train(x):
                 loss = loss + c
                 train_index = train_index + batch_size
             print("epoch: ", epoch, "total loss: ", loss)
-            
+        saver.save(sess, '/tmp/sentiment.ckpt') #save this session and variables
+        print("parameters saved")
         list_test = tf.equal(tf.argmax(y_hat, 1), tf.argmax(y, 1)) #by row
         prediction_rate = tf.reduce_mean(tf.cast(list_test, 'float'))
         print("prediction rate: ", sess.run(prediction_rate, feed_dict = {x: file["test_x"], y:file["test_y"]}))
 
 test_train(x)
+#model has 90% prediction rate for test set. Could do better
     
 def convert_to_input(string, total_frame = file["frame"]):
     bag_of_words_item = np.zeros(len(total_frame))
     word_token = nltk.tokenize.word_tokenize(string.lower())        
     for word in word_token:
-        lemmatized_word = nltk.stem.WordNetLemmatizer().lemmatize(word, "v")
-        if lemmatized_word in total_frame:            
-            bag_of_words_item[total_frame.index(lemmatized_word)] = bag_of_words_item[total_frame.index(lemmatized_word)] + 1
-    return(np.array(bag_of_words_item))
+        lemmatized_word = nltk.stem.WordNetLemmatizer().lemmatize(word, "v")        
+        if lemmatized_word in total_frame:              
+            bag_of_words_item[total_frame.index(lemmatized_word)] = bag_of_words_item[total_frame.index(lemmatized_word)] + 1           
+    bag_of_words_item = np.reshape(bag_of_words_item, (1, len(bag_of_words_item)))
+    return(bag_of_words_item)
 
+def instance_test(input_data):
+    y_hat = tf.nn.softmax(feed_forward(x))
+    with tf.Session() as sess:
+        saver.restore(sess, '/tmp/sentiment.ckpt') #load prameters to this session         
+        result = sess.run(y_hat, feed_dict = {x:convert_to_input(input_data)})[0]        
+        if result[0] > result[1]:
+            print(input_data, "\n: positive")            
+        elif result[1] > result[0]:
+            print(input_data, "\n: negative")            
+        else:
+            print(input_data, "\n: neutal")
+            
+            
+test = [
+        "I really want to buy another one because my first purchase was just too good",\
+        "I was very disappointed to have my uranium confiscated at the airport. It was a gift for my son for his birthday. Also, I'm in prison now, so that's not good either.", \
+        "comfortable fit and fast delivery 5 stars.", \
+        "One drawback, when it was delivered the capsule had no bolt on the outside. But I’m handy, so I installed one.", \        
+        "This was viewed by the wife she said she enjoyed it. I don't like to see her enjoying her self so one star", \
+        "There are movies that are bad. There are movies that are so-bad-they're-good. And then there's Troll 2 -- a movie that's so bad that it defies comprehension",\
+        "The jail was very nice and well clean. The cops were very friendly. The beds are also very comfortable.",\
+        ]
+        
+        for item in test:    
+    instance_test(item)
 
-a = convert_to_input("this product is the worst mistake I ahve ever made")
+'''
+INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
+I really want to buy another one because my first purchase was just too good 
+: positive
+INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
+I was very disappointed to have my uranium confiscated at the airport. It was a gift for my son for his birthday. Also, I'm in prison now, so that's not good either. 
+: negative
+INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
+comfortable fit and fast delivery 5 stars. 
+: positive
+INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
+One drawback, when it was delivered the capsule had no bolt on the outside. But I’m handy, so I installed one. 
+: negative
+INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
+I love this cleanser!!! I purchased for the 1st time in August 2017 in within less than 3 weeks it cleared up my hormonal acne. 
+: negative
+INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
+This was viewed by the wife she said she enjoyed it. I don't like to see her enjoying her self so one star 
+: positive
+INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
+There are movies that are bad. There are movies that are so-bad-they're-good. And then there's Troll 2 -- a movie that's so bad that it defies comprehension 
+: negative
+INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
+The jail was very nice and well clean. The cops were very friendly. The beds are also very comfortable. 
+: positive
+'''
+         
