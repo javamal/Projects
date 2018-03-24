@@ -115,28 +115,20 @@ for item in test:
     instance_test(item)
 
 '''
-INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
 I really want to buy another one because my first purchase was just too good 
 : positive
-INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
 I was very disappointed to have my uranium confiscated at the airport. It was a gift for my son for his birthday. Also, I'm in prison now, so that's not good either. 
 : negative
-INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
 comfortable fit and fast delivery 5 stars. 
 : positive
-INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
 One drawback, when it was delivered the capsule had no bolt on the outside. But I’m handy, so I installed one. 
 : negative
-INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
 I love this cleanser!!! I purchased for the 1st time in August 2017 in within less than 3 weeks it cleared up my hormonal acne. 
 : negative
-INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
 This was viewed by the wife she said she enjoyed it. I don't like to see her enjoying her self so one star 
 : positive
-INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
 There are movies that are bad. There are movies that are so-bad-they're-good. And then there's Troll 2 -- a movie that's so bad that it defies comprehension 
 : negative
-INFO:tensorflow:Restoring parameters from /tmp/sentiment.ckpt
 The jail was very nice and well clean. The cops were very friendly. The beds are also very comfortable. 
 : positive
 '''
