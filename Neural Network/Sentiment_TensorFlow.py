@@ -111,7 +111,7 @@ test = [
         "The jail was very nice and well clean. The cops were very friendly. The beds are also very comfortable.",\
         ]
         
-        for item in test:    
+for item in test:    
     instance_test(item)
 
 '''
