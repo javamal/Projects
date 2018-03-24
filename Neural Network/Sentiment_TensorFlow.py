@@ -127,7 +127,7 @@ I love this cleanser!!! I purchased for the 1st time in August 2017 in within le
 : negative
 This was viewed by the wife she said she enjoyed it. I don't like to see her enjoying her self so one star 
 : positive
-There are movies that are bad. There are movies that are so-bad-they're-good. And then there's Troll 2 -- a movie that's so bad that it defies comprehension 
+There are movies that are bad. There are movies that are so-bad-they're-good. And then there's Finding Dory -- a movie that's so bad that it defies comprehension 
 : negative
 The jail was very nice and well clean. The cops were very friendly. The beds are also very comfortable. 
 : positive
