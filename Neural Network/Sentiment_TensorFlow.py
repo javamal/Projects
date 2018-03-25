@@ -1,9 +1,10 @@
 import nltk
 import pickle
+import os
 import numpy as np
 import tensorflow as tf
 
-tf.reset_default_graph()
+save_path = "C:\\Users\\donkey\\Desktop\\machine learning\\Neural Network\\sentiment\\ckpt"
 '''
 load test and train data
 '''
@@ -11,14 +12,15 @@ with open("Sentiment_Data_BoW.pickle", "rb") as load_file:
     file = pickle.load(load_file) #label is mixed, no need to shuffle
     load_file.close()    
 
+tf.reset_default_graph()
 #parameters
 input_size = len(file["train_x"][0])
 neuron_1 = 500
 neuron_2 = 500
 neuron_3 = 500
 output_size = len(file["train_y"][0])
-total_epochs = 10
-batch_size = 100
+total_epochs = 20
+batch_size = 50
 
 #define placeholders
 x = tf.placeholder('float', [None, input_size])
@@ -70,13 +72,12 @@ def test_train(x):
                 loss = loss + c
                 train_index = train_index + batch_size
             print("epoch: ", epoch, "total loss: ", loss)
-        saver.save(sess, '/tmp/model.ckpt') #save this session and variables
+        saver.save(sess, os.path.join(save_path, 'model.ckpt')) #save this session and variables
         print("parameters saved")
         list_test = tf.equal(tf.argmax(y_hat, 1), tf.argmax(y, 1)) #by row
         prediction_rate = tf.reduce_mean(tf.cast(list_test, 'float'))
         print("prediction rate: ", sess.run(prediction_rate, feed_dict = {x: file["test_x"], y:file["test_y"]}))
-        sess.close()
-
+    
 #test_train(x) 
 
 def convert_to_input(string, total_frame = file["frame"]):
@@ -90,10 +91,8 @@ def convert_to_input(string, total_frame = file["frame"]):
     return(bag_of_words_item)
     
 def instance_test(input_data):    
-    with tf.Session() as sess:
-        #sess.run(tf.global_variables_initializer())
-        #saver = tf.train.import_meta_graph('C:\\Users\\donkey\\Desktop\\machine learning\\Neural Network\\sentiment\\ckpt\\model.ckpt.meta')
-        saver.restore(sess, '/tmp/model.ckpt') #load prameters to this session         
+    with tf.Session() as sess:   
+        saver.restore(sess, os.path.join(save_path, 'model.ckpt')) #load prameters to this session         
         y_hat = tf.nn.softmax(feed_forward(x))              
         result = sess.run(y_hat, feed_dict = {x:convert_to_input(input_data)})[0]        
         if result[0] > result[1]:
@@ -101,9 +100,7 @@ def instance_test(input_data):
         elif result[1] > result[0]:
             print("negative")            
         else:
-            print("neutal")
-        sess.close()             
-            
+            print("neutal")                
             
 test = [
         "I really want to buy another one because my first purchase was just too good",\
