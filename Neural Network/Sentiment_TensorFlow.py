@@ -3,6 +3,7 @@ import pickle
 import numpy as np
 import tensorflow as tf
 
+tf.reset_default_graph()
 '''
 load test and train data
 '''
@@ -24,30 +25,30 @@ x = tf.placeholder('float', [None, input_size])
 y = tf.placeholder('float', [None, output_size])
 
 #define variables
-layer_1 = {"weights":tf.Variable(tf.random_normal([input_size, neuron_1])),
-           "bias":tf.Variable(tf.random_normal([1, neuron_1]))}
-layer_2 = {"weights":tf.Variable(tf.random_normal([neuron_1, neuron_2])),
-           "bias":tf.Variable(tf.random_normal([1, neuron_2]))}
-layer_3 = {"weights":tf.Variable(tf.random_normal([neuron_2, neuron_3])),
-           "bias":tf.Variable(tf.random_normal([1, neuron_3]))}
-output_layer = {"weights":tf.Variable(tf.random_normal([neuron_3, output_size])),
-                "bias":tf.Variable(tf.random_normal([1, output_size]))}                                                        
+layer_1_w = tf.Variable(tf.random_normal([input_size, neuron_1]))
+layer_1_b = tf.Variable(tf.random_normal([1, neuron_1]))
+layer_2_w = tf.Variable(tf.random_normal([neuron_1, neuron_2]))
+layer_2_b = tf.Variable(tf.random_normal([1, neuron_2]))
+layer_3_w = tf.Variable(tf.random_normal([neuron_2, neuron_3]))
+layer_3_b = tf.Variable(tf.random_normal([1, neuron_3]))
+output_layer_w = tf.Variable(tf.random_normal([neuron_3, output_size]))
+output_layer_b = tf.Variable(tf.random_normal([1, output_size]))
 
-saver = tf.train.Saver()                                           
-              
+saver = tf.train.Saver()
+    
 def feed_forward(data):    
     #using rectified linear units as activation functions
     #t(W * x) = t(x) * t(W)
-    layer_1_out = tf.matmul(data, layer_1["weights"]) + layer_1["bias"]
+    layer_1_out = tf.matmul(data, layer_1_w) + layer_1_b
     layer_1_out = tf.nn.relu(layer_1_out)
     
-    layer_2_out = tf.matmul(layer_1_out, layer_2["weights"]) + layer_2["bias"]
+    layer_2_out = tf.matmul(layer_1_out, layer_2_w) + layer_2_b
     layer_2_out = tf.nn.relu(layer_2_out)
     
-    layer_3_out = tf.matmul(layer_2_out, layer_3["weights"]) + layer_3["bias"]
+    layer_3_out = tf.matmul(layer_2_out, layer_3_w) + layer_3_b
     layer_3_out = tf.nn.relu(layer_3_out)
     
-    output_out = tf.matmul(layer_3_out, output_layer["weights"]) + output_layer["bias"]    
+    output_out = tf.matmul(layer_3_out, output_layer_w) + output_layer_b
     return(output_out)
 
 def test_train(x):
@@ -69,15 +70,15 @@ def test_train(x):
                 loss = loss + c
                 train_index = train_index + batch_size
             print("epoch: ", epoch, "total loss: ", loss)
-        saver.save(sess, '/tmp/sentiment.ckpt') #save this session and variables
+        saver.save(sess, '/tmp/model.ckpt') #save this session and variables
         print("parameters saved")
         list_test = tf.equal(tf.argmax(y_hat, 1), tf.argmax(y, 1)) #by row
         prediction_rate = tf.reduce_mean(tf.cast(list_test, 'float'))
         print("prediction rate: ", sess.run(prediction_rate, feed_dict = {x: file["test_x"], y:file["test_y"]}))
+        sess.close()
 
-test_train(x)
-#model has 90% prediction rate for test set. Could do better
-    
+#test_train(x) 
+
 def convert_to_input(string, total_frame = file["frame"]):
     bag_of_words_item = np.zeros(len(total_frame))
     word_token = nltk.tokenize.word_tokenize(string.lower())        
@@ -87,18 +88,21 @@ def convert_to_input(string, total_frame = file["frame"]):
             bag_of_words_item[total_frame.index(lemmatized_word)] = bag_of_words_item[total_frame.index(lemmatized_word)] + 1           
     bag_of_words_item = np.reshape(bag_of_words_item, (1, len(bag_of_words_item)))
     return(bag_of_words_item)
-
-def instance_test(input_data):
-    y_hat = tf.nn.softmax(feed_forward(x))
+    
+def instance_test(input_data):    
     with tf.Session() as sess:
-        saver.restore(sess, '/tmp/sentiment.ckpt') #load prameters to this session         
+        #sess.run(tf.global_variables_initializer())
+        #saver = tf.train.import_meta_graph('C:\\Users\\donkey\\Desktop\\machine learning\\Neural Network\\sentiment\\ckpt\\model.ckpt.meta')
+        saver.restore(sess, '/tmp/model.ckpt') #load prameters to this session         
+        y_hat = tf.nn.softmax(feed_forward(x))              
         result = sess.run(y_hat, feed_dict = {x:convert_to_input(input_data)})[0]        
         if result[0] > result[1]:
-            print(input_data, "\n: positive")            
+            print("positive")            
         elif result[1] > result[0]:
-            print(input_data, "\n: negative")            
+            print("negative")            
         else:
-            print(input_data, "\n: neutal")
+            print("neutal")
+        sess.close()             
             
             
 test = [
