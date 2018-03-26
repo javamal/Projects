@@ -63,20 +63,18 @@ def feed_forward(data):
     
     out_1 = tf.matmul(data, layer_1["weights"]) + layer_1["bias"]
     out_1 = tf.nn.relu(out_1)
-    #out_1 = tf.nn.sigmoid(out_1)    
+       
     out_2 = tf.matmul(out_1, layer_2["weights"]) + layer_2["bias"]
-    out_2 = tf.nn.relu(out_2)  
-    #out_2 = tf.nn.sigmoid(out_2)
+    out_2 = tf.nn.relu(out_2)
+    
     output_out = tf.matmul(out_2, output_layer["weights"]) + output_layer["bias"]
     
     return(output_out)
     
    
 def test_train_nn(x, rate = 0):
-    y_hat = feed_forward(x)    
-    #cost = tf.reduce_sum(tf.square(y - y_hat))
-    #optimize = tf.train.GradientDescentOptimizer(rate).minimize(cost)
-    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = y_hat, labels = y))
+    y_hat = feed_forward(x)        
+    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = y_hat, labels = y)) #[1,0] or [0,1]
     optimize = tf.train.AdamOptimizer().minimize(cost)
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
