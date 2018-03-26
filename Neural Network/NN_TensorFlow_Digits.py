@@ -1,4 +1,4 @@
-#activation function: relu and softmax
+#activation function: relu / softmax
 #loss function: cross entropy
 #optimizer: adaptive moment estimation
 import tensorflow as tf
@@ -23,6 +23,8 @@ def feed_forward(x):
                                                    
     output_layer = {"weights":tf.Variable(tf.random_normal([neuron_1, output_size])),\
                     "bias":tf.Variable(tf.random_normal([1, output_size]))}
+    
+    #saving variables in dictionary might not be the best idea for saving variables? Not sure how this works
                                                                                        
     layer_1_out = tf.matmul(x, layer_1["weights"]) + layer_1["bias"]
     layer_1_out = tf.nn.relu(layer_1_out)
