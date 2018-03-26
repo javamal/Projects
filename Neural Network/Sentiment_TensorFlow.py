@@ -125,7 +125,7 @@ comfortable fit and fast delivery 5 stars.
 One drawback, when it was delivered the capsule had no bolt on the outside. But I’m handy, so I installed one. 
 : negative
 I love this cleanser!!! I purchased for the 1st time in August 2017 in within less than 3 weeks it cleared up my hormonal acne. 
-: negative
+: negative #not sure why this was classified as negative. 'love' seems to be a strong predictor for positive sentiment
 This was viewed by the wife she said she enjoyed it. I don't like to see her enjoying her self so one star 
 : positive
 There are movies that are bad. There are movies that are so-bad-they're-good. And then there's Finding Dory -- a movie that's so bad that it defies comprehension 
