@@ -17,7 +17,7 @@ set up training data
 def random_play():
     score_goal = 50
     total_trial = 10000
-    total_moves = 500 #if it can survive for 300 moves I guess there's no harm in counting it as success  
+    total_moves = 500 #if it can survive for 500 moves I guess there's no harm in counting it as success  
     train_data = []
     all_score = []
     for trials in range(total_trial):
