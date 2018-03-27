@@ -171,8 +171,7 @@ def test():
                 left_or_right = env.action_space.sample()                
             else:                      
                 #after the first move, model makes predictions
-                #left_or_right = nn_predict(np.array(observations))  
-                left_or_right = np.argmax(model.predict(observations.reshape(-1,len(observations),1))[0])
+                left_or_right = nn_predict(np.array(observations))                  
             obs, reward, done, info = env.step(left_or_right)            
             observations = obs #next observation determined by current move
             score_per_trial = score_per_trial + reward
