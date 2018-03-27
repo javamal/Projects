@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 
 # from https://gym.openai.com/docs/
+# reinforcement learning practice
 # the longer I can keep the pole in balance - higher the score
 # want to create a model that can acheive an average score of 200
 global_goal = 200
@@ -23,6 +24,7 @@ def random_play():
         score_per_trial = 0
         data = []
         observations = []
+        first_move = True
         for moves in range(total_moves):
             left_or_right = env.action_space.sample()
             obs, reward, done, info = env.step(left_or_right)            
@@ -30,10 +32,11 @@ def random_play():
             #obs is an output of left_or_right
             #only makes sense I make a move based on observation
             #match current move with previous observation
-            if len(observations) > 0:
+            if first_move == False:
                 data.append([observations, left_or_right])
             else:
                 observations = obs
+                first_move = False
             score_per_trial = score_per_trial + reward
             if done == True:
                 break
@@ -64,8 +67,8 @@ input_size = 4 #observations
 neuron_1 = 500
 neuron_2 = 500
 neuron_3 = 500 
-output_size = 2 #move
-total_epochs = 100
+output_size = len( #move
+total_epochs = 5
 batch_size = 100
 
 #define placeholders
@@ -146,17 +149,18 @@ def test():
         env.reset()
         observations = []
         score_per_trial = 0
+        first_move = True
         for moves in range(total_moves):
             #env.render()
-            if len(observations) == 0:
+            if first_move == True:
                 #first move made randomly
                 move = env.action_space.sample()
+                first_move = False
             else:                      
                 #after the first move, model makes predictions
-                move = nn_predict(np.array(observations))
-            
-            obs, reward, done, info = env.step(move)
-            
+                move = nn_predict(np.array(observations))  
+                
+            obs, reward, done, info = env.step(move)            
             observations = obs #next observation determined by current move
             score_per_trial = score_per_trial + reward
             if done == True:
